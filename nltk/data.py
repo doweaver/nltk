@@ -77,7 +77,7 @@ path += [d for d in _paths_from_env if d]
 if 'APPENGINE_RUNTIME' not in os.environ and os.path.expanduser('~/') != '~/':
     path.append(os.path.expanduser(str('~/nltk_data')))
 
-if sys.platform.startswith('win'):
+if os.name == 'nt':
     # Common locations on Windows:
     path += [
         str(r'C:\nltk_data'), str(r'D:\nltk_data'), str(r'E:\nltk_data'),
@@ -111,7 +111,7 @@ def split_resource_url(resource_url):
     """
     Splits a resource url into "<protocol>:<path>".
 
-    >>> windows = sys.platform.startswith('win')
+    >>> windows = os.name == 'nt'
     >>> split_resource_url('nltk:home/nltk')
     ('nltk', 'home/nltk')
     >>> split_resource_url('nltk:/home/nltk')
@@ -138,7 +138,7 @@ def normalize_resource_url(resource_url):
     r"""
     Normalizes a resource url
 
-    >>> windows = sys.platform.startswith('win')
+    >>> windows = os.name == 'nt'
     >>> os.path.normpath(split_resource_url(normalize_resource_url('file:grammar.fcfg'))[1]) == \
     ... ('\\' if windows else '') + os.path.abspath(os.path.join(os.curdir, 'grammar.fcfg'))
     True
@@ -199,7 +199,7 @@ def normalize_resource_name(resource_name, allow_relative=True, relative_path=No
         be converted to a platform-appropriate path separator.
         Directory trailing slashes are preserved
 
-    >>> windows = sys.platform.startswith('win')
+    >>> windows = os.name == 'nt'
     >>> normalize_resource_name('.', True)
     './'
     >>> normalize_resource_name('./', True)
@@ -218,7 +218,7 @@ def normalize_resource_name(resource_name, allow_relative=True, relative_path=No
     True
     """
     is_dir = bool(re.search(r'[\\/.]$', resource_name)) or resource_name.endswith(os.path.sep)
-    if sys.platform.startswith('win'):
+    if os.name == 'nt':
         resource_name = resource_name.lstrip('/')
     else:
         resource_name = re.sub(r'^/+', '/', resource_name)
@@ -230,7 +230,7 @@ def normalize_resource_name(resource_name, allow_relative=True, relative_path=No
         resource_name = os.path.abspath(
             os.path.join(relative_path, resource_name))
     resource_name = resource_name.replace('\\', '/').replace(os.path.sep, '/')
-    if sys.platform.startswith('win') and os.path.isabs(resource_name):
+    if os.name == 'nt' and os.path.isabs(resource_name):
         resource_name = '/' + resource_name
     if is_dir and not resource_name.endswith('/'):
         resource_name += '/'
